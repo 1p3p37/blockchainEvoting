@@ -81,21 +81,21 @@ contract Voting {
         return results;
     }
 
-struct OptionInfo {
-    uint index;
-    string name;
-}
-
-function getAllOptions() public view returns (OptionInfo[] memory) {
-    OptionInfo[] memory result = new OptionInfo[](options.length);
-    for (uint i = 0; i < options.length; i++) {
-        result[i] = OptionInfo(i, options[i]);
+    struct OptionInfo {
+        uint index;
+        string name;
     }
-    return result;
+
+    function getAllOptions() public view returns (OptionInfo[] memory) {
+        OptionInfo[] memory result = new OptionInfo[](options.length);
+        for (uint i = 0; i < options.length; i++) {
+            result[i] = OptionInfo(i, options[i]);
+        }
+        return result;
+    }
+
 }
 
-
-}
 //  can you add a gas limit to my functions that use gas     ["Trump","Biden","Putin"]
 
 
