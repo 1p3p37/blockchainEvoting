@@ -7,4 +7,3 @@ build/
 reports/
 Votings.sol
 node_modules/
-contracts/build/
