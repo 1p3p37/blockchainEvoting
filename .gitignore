@@ -5,3 +5,6 @@ __pycache__
 .hypothesis/
 build/
 reports/
+Votings.sol
+node_modules/
+contracts/build/
