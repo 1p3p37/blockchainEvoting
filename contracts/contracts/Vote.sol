@@ -22,6 +22,13 @@ contract MultiOptionStringVote {
 
     mapping(string => Vote) private votes;
 
+    modifier onlyActiveVoting(string memory voteName) {
+        require(votes[voteName].endTime > block.timestamp, "Voting has ended");
+        require(votes[voteName].startTime <= block.timestamp, "Voting has not yet started");
+        _;
+    }
+
+
     function createVote(
         string memory voteName, 
         uint256 startTime, 
@@ -31,7 +38,9 @@ contract MultiOptionStringVote {
         address[] memory ownerPermissionList
         ) public {
         require(startTime < endTime, "End time must be after start time");
-        require(votes[voteName].endTime == 0, "Vote with same name already exists");
+        require(options.length > 0, "Options array must not be empty");
+        // require(votes[voteName].endTime == 0, "Vote with same name already exists");
+        require(bytes(voteName).length >= 3 && bytes(voteName).length <= 128, "Vote name length must be between 3 and 128 characters");
 
         votes[voteName].startTime = startTime;
         votes[voteName].endTime = endTime;
@@ -53,9 +62,7 @@ contract MultiOptionStringVote {
         emit VotingCreated();
     }
 
-    function castVote(string memory voteName, string memory option) public {
-        require(votes[voteName].endTime > block.timestamp, "Voting has ended");
-        require(votes[voteName].startTime <= block.timestamp, "Voting has not yet started");
+    function castVote(string memory voteName, string memory option) public onlyActiveVoting(voteName) {
         require(votes[voteName].votePermissions[msg.sender], "You don't have permission to vote");
         require(!votes[voteName].voters.contains(msg.sender), "You have already voted");
 
@@ -66,9 +73,7 @@ contract MultiOptionStringVote {
         emit votedEvent(voteName, msg.sender);
     }
 
-    function revote(string memory voteName, string memory option) public {
-        require(votes[voteName].endTime > block.timestamp, "Voting has ended");
-        require(votes[voteName].startTime <= block.timestamp, "Voting has not yet started");
+    function revote(string memory voteName, string memory option) public onlyActiveVoting(voteName) {
         require(votes[voteName].votePermissions[msg.sender], "You don't have permission to vote");
         require(votes[voteName].voters.contains(msg.sender), "You haven't voted yet");
 
@@ -107,9 +112,7 @@ contract MultiOptionStringVote {
         return votersArray;
     }
 
-    function grantVoteRights(string memory voteName, address[] memory votePermissionList) public {
-        require(votes[voteName].endTime > block.timestamp, "Voting has ended");
-        require(votes[voteName].startTime <= block.timestamp, "Voting has not yet started");
+    function grantVoteRights(string memory voteName, address[] memory votePermissionList) public onlyActiveVoting(voteName) {
         require(votes[voteName].ownerPermissions[msg.sender], "You don't have permission to vote");
         
         for (uint i = 0; i < votePermissionList.length; i++) {
