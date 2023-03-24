@@ -14,6 +14,7 @@ contract MultiOptionStringVote {
         uint256 endTime;
         string[] options;
         EnumerableSet.AddressSet voters;
+        mapping(string => bool) optionsMap;
         mapping(string => uint256) voteCounts;
         mapping(address => bool) ownerPermissions;
         mapping(address => bool) votePermissions;
@@ -39,8 +40,13 @@ contract MultiOptionStringVote {
         ) public {
         require(startTime < endTime, "End time must be after start time");
         require(options.length > 0, "Options array must not be empty");
-        // require(votes[voteName].endTime == 0, "Vote with same name already exists");
-        require(bytes(voteName).length >= 3 && bytes(voteName).length <= 128, "Vote name length must be between 3 and 128 characters");
+        require(votes[voteName].options.length == 0, "Vote with same name already exists");
+        require(bytes(voteName).length >= 3 && bytes(voteName).length <= 64, "Vote name length must be between 3 and 64 characters");
+
+        for (uint i = 0; i < options.length; i++) {
+            uint256 optionLen = bytes(options[i]).length;
+            if (optionLen <= 3 || optionLen >= 64) revert("Vote option length must be between 3 and 64 character");
+        }
 
         votes[voteName].startTime = startTime;
         votes[voteName].endTime = endTime;
@@ -49,6 +55,7 @@ contract MultiOptionStringVote {
 
         for (uint i = 0; i < options.length; i++) {
             votes[voteName].voteCounts[options[i]] = 0;
+            votes[voteName].optionsMap[options[i]] = true;
         }
 
         for (uint i = 0; i < ownerPermissionList.length; i++) {
@@ -62,9 +69,11 @@ contract MultiOptionStringVote {
         emit VotingCreated();
     }
 
+
     function castVote(string memory voteName, string memory option) public onlyActiveVoting(voteName) {
         require(votes[voteName].votePermissions[msg.sender], "You don't have permission to vote");
         require(!votes[voteName].voters.contains(msg.sender), "You have already voted");
+        require(votes[voteName].optionsMap[option], "This option doesn't exist");
 
         votes[voteName].voteCounts[option]++;
         votes[voteName].voters.add(msg.sender);
@@ -76,6 +85,7 @@ contract MultiOptionStringVote {
     function revote(string memory voteName, string memory option) public onlyActiveVoting(voteName) {
         require(votes[voteName].votePermissions[msg.sender], "You don't have permission to vote");
         require(votes[voteName].voters.contains(msg.sender), "You haven't voted yet");
+        require(votes[voteName].optionsMap[option], "This option doesn't exist");
 
         string memory lastOption = votes[voteName].votedFor[msg.sender];
 
@@ -84,7 +94,7 @@ contract MultiOptionStringVote {
     
         emit votedEvent(voteName, msg.sender);
     }
-
+// ["0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"]
     function getOptions(string memory voteName) public view returns (string[] memory) {
         require(votes[voteName].votePermissions[msg.sender], "You don't have permission to this vote");
         return votes[voteName].options;
@@ -92,6 +102,7 @@ contract MultiOptionStringVote {
 
     function getScore(string memory voteName, string memory option) public view returns (uint) {
         require(votes[voteName].votePermissions[msg.sender], "You don't have permission to this vote");
+        require(votes[voteName].optionsMap[option], "This option doesn't exist");
         return votes[voteName].voteCounts[option];
     }
 
