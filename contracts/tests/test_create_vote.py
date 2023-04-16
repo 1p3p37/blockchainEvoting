@@ -1,10 +1,10 @@
 import pytest
-from brownie import MultiOptionStringVote, accounts, reverts, web3
+from brownie import Voting, accounts, reverts, web3
 
 
 @pytest.fixture
 def vote():
-    yield MultiOptionStringVote.deploy({"from": accounts[0]})
+    yield Voting.deploy({"from": accounts[0]})
 
 
 def test_create_vote(vote):
@@ -35,7 +35,7 @@ def test_create_exists_vote(vote):
 
 
 def test_empty_options_vote(vote):
-    with reverts("Options array must not be empty"):
+    with reverts("Options array must not be empty and cannot be more than 20"):
         vote.createVote(
             "EmptyOptionsVote",
             web3.eth.get_block("latest").timestamp,

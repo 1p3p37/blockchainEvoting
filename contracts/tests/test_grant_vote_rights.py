@@ -1,5 +1,5 @@
 import pytest
-from brownie import MultiOptionStringVote, accounts, reverts, web3
+from brownie import Voting, accounts, reverts, web3
 
 # import web3
 from brownie.network.state import Chain
@@ -8,7 +8,7 @@ import brownie
 
 @pytest.fixture
 def vote():
-    yield MultiOptionStringVote.deploy({"from": accounts[0]})
+    yield Voting.deploy({"from": accounts[0]})
 
 
 def test_grant_vote_rights(vote):

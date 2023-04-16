@@ -1,10 +1,10 @@
 import pytest
-from brownie import MultiOptionStringVote, accounts, reverts, web3
+from brownie import Voting, accounts, reverts, web3
 
 
 @pytest.fixture
 def vote():
-    yield MultiOptionStringVote.deploy({"from": accounts[0]})
+    yield Voting.deploy({"from": accounts[0]})
 
 
 def test_cast_vote(vote):
@@ -25,7 +25,7 @@ def test_cast_vote(vote):
     assert vote.getScore("MyVote", "Option1", {"from": accounts[1]}) == 1
 
     # Try to cast a vote for an option that does not exist
-
+# 
 
 def test_cast_vote_invalid_option(vote):
     # Create a vote

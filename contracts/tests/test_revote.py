@@ -1,13 +1,12 @@
 import pytest
 
-from brownie import MultiOptionStringVote, accounts, reverts, web3
+from brownie import Voting, accounts, reverts, web3
 from brownie.network.state import Chain
-
 
 
 @pytest.fixture
 def vote():
-    yield MultiOptionStringVote.deploy({"from": accounts[0]})
+    yield Voting.deploy({"from": accounts[0]})
 
 
 def test_revote_success(vote):
@@ -78,7 +77,7 @@ def test_revote_inactive_vote(vote):
     # Cast initial vote
     with reverts("Voting has not yet started"):
         vote.castVote("MyVote", "Option1", {"from": accounts[1]})
-    
+
     Chain().sleep(7201)
 
     # Try to re-vote after the vote has ended
@@ -137,7 +136,7 @@ def test_revote_after_voting_period(vote):
 
     # Cast initial vote
     vote.castVote("MyVote", "Option1", {"from": accounts[1]})
-    
+
     # Wait for the revoting period to end
     Chain().sleep(3601)
 
@@ -204,7 +203,7 @@ def test_revote_nonexistent_vote(vote):
     )
 
     # Cast initial vote
-    vote.castVote("MyVote", "Option1", {"from": accounts[1]})    
+    vote.castVote("MyVote", "Option1", {"from": accounts[1]})
 
     # Try to re-vote for a vote that doesn't exist
     with reverts("Voting has ended"):
@@ -228,4 +227,3 @@ def test_revote_nonexistent_vote(vote):
 #     # Try to re-vote when not allowed
 #     with reverts("Revoting not allowed for this voter"):
 #         vote.revote("MyVote", "Option2", {"from": accounts[1]})
-
