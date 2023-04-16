@@ -47,7 +47,6 @@ class EthereumSettings(BlockchainSettings):
     network: custom_types.EthereumNetwork
     rpc_url: str
     rpc_connection_timeout: int
-    reward_contract_address: str
     voting_contract_address: str
     always_restart_interval: int
     confirmation_blocks: int
@@ -63,11 +62,11 @@ class EthereumSettings(BlockchainSettings):
             )
         )
 
-    @cached_property
-    def reward_contract(self) -> "RewardContract":
-        from app.services.contracts.reward import RewardContract
+    # @cached_property
+    # def reward_contract(self) -> "RewardContract":
+    #     from app.services.contracts.reward import RewardContract
 
-        return RewardContract(self)
+    #     return RewardContract(self)
 
     @cached_property
     def voting_contract(self) -> "VotingContract":

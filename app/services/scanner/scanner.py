@@ -17,10 +17,6 @@ class EventScanner(threading.Thread):
     def __init__(self, network: EthereumSettings, event: ContractEvent, handler):
         super().__init__()
         self.network = network
-        self.logger.info(
-            "Started____ 1 NETWORK {network} ______ {network.reward_contract_address}"
-        )
-        print("2" + network.reward_contract_address)
         self.event = event
         self.handler = handler
         self.db_record: models.EventScanner = None
