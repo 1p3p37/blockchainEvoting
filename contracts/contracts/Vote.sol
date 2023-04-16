@@ -3,11 +3,23 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-contract MultiOptionStringVote {
+contract Voting {
     using EnumerableSet for EnumerableSet.AddressSet;
 
-    event VotingCreated();
-    event votedEvent(string voteName, address voter); 
+    event VotingCreated(
+        string voteName,
+        uint256 startTime,
+        uint256 endTime,
+        string[] options,
+        address[] ownerPermissionList
+    );
+    event GrantedRights(address owner, address[] voters);
+    event VoteCasted(
+        string voteName, 
+        string votedFor,
+        address voter,
+        bool isRevote 
+        ); 
 
     struct Vote {
         uint256 startTime;
@@ -39,24 +51,22 @@ contract MultiOptionStringVote {
         address[] memory ownerPermissionList
         ) public {
         require(startTime < endTime, "End time must be after start time");
-        require(options.length > 0, "Options array must not be empty");
+        require(options.length > 0 && options.length < 20, "Options array must not be empty and cannot be more than 20");
         require(votes[voteName].options.length == 0, "Vote with same name already exists");
         require(bytes(voteName).length >= 3 && bytes(voteName).length <= 64, "Vote name length must be between 3 and 64 characters");
 
         for (uint i = 0; i < options.length; i++) {
             uint256 optionLen = bytes(options[i]).length;
-            if (optionLen <= 3 || optionLen >= 64) revert("Vote option length must be between 3 and 64 character");
+            require (optionLen > 3 && optionLen < 64 , "Vote option length must be between 3 and 64 character");
+
+            votes[voteName].voteCounts[options[i]] = 0;
+            votes[voteName].optionsMap[options[i]] = true;
         }
 
         votes[voteName].startTime = startTime;
         votes[voteName].endTime = endTime;
         votes[voteName].options = options;
         votes[voteName].ownerPermissions[msg.sender] = true;
-
-        for (uint i = 0; i < options.length; i++) {
-            votes[voteName].voteCounts[options[i]] = 0;
-            votes[voteName].optionsMap[options[i]] = true;
-        }
 
         for (uint i = 0; i < ownerPermissionList.length; i++) {
             votes[voteName].ownerPermissions[ownerPermissionList[i]] = true;
@@ -66,7 +76,13 @@ contract MultiOptionStringVote {
             votes[voteName].votePermissions[votePermissionList[i]] = true;
         }
 
-        emit VotingCreated();
+        emit VotingCreated(
+            voteName,
+            startTime,
+            endTime,
+            options,
+            ownerPermissionList
+        );
     }
 
 
@@ -79,7 +95,7 @@ contract MultiOptionStringVote {
         votes[voteName].voters.add(msg.sender);
         votes[voteName].votedFor[msg.sender] = option;
         
-        emit votedEvent(voteName, msg.sender);
+        emit VoteCasted(voteName, option, msg.sender, false);
     }
 
     function revote(string memory voteName, string memory option) public onlyActiveVoting(voteName) {
@@ -92,9 +108,9 @@ contract MultiOptionStringVote {
         votes[voteName].voteCounts[lastOption]--;
         votes[voteName].voteCounts[option]++;
     
-        emit votedEvent(voteName, msg.sender);
+        emit VoteCasted(voteName, option, msg.sender, true);
     }
-// ["0xAb8483F64d9C6d1EcF9b849Ae677dD3315835cb2","0x5B38Da6a701c568545dCfcB03FcB875f56beddC4"]
+
     function getOptions(string memory voteName) public view returns (string[] memory) {
         require(votes[voteName].votePermissions[msg.sender], "You don't have permission to this vote");
         return votes[voteName].options;
@@ -129,6 +145,8 @@ contract MultiOptionStringVote {
         for (uint i = 0; i < votePermissionList.length; i++) {
             votes[voteName].votePermissions[votePermissionList[i]] = true;
         }
+
+        emit GrantedRights(msg.sender, votePermissionList);
     }
 
 }
