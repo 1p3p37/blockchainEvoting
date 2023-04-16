@@ -13,11 +13,6 @@
 #     scheduler = AsyncIOScheduler()
 
 #     scheduler.add_job(
-#         handle_callback_task,
-#         "interval",
-#         seconds=settings.callback_task_interval_seconds,
-#     )
-#     scheduler.add_job(
 #         handle_pending_callback_task,
 #         "interval",
 #         seconds=settings.callback_pending_task_interval_seconds,

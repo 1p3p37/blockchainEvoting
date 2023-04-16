@@ -16,7 +16,6 @@ from eth_typing.evm import ChecksumAddress
 
 
 if TYPE_CHECKING:
-    from app.services.contracts.reward import RewardContract
     from app.services.contracts.voting import VotingContract
 
 DB_URL = "postgres://{user}:{password}@{hostname}:{port}/{db}".format(
