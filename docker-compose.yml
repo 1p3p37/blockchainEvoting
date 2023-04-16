@@ -1,0 +1,45 @@
+version: "3.8"
+
+services:
+
+  db:
+    image: postgres:14.3
+    env_file: .env
+    volumes:
+      - ./.docker/postgres/data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+    restart: always
+    env_file: .env
+    depends_on:
+      - db
+    volumes:
+      - ./:/app/
+    ports:
+      - "${DOCKER_EXPOSE_PORT:-8000}:${FASTAPI_PORT:-8000}"
+    command: uvicorn app.main:app --host 0.0.0.0 --port "${FASTAPI_PORT:-8000}"
+
+  scheduler:
+    build:
+      context: .
+    restart: always
+    env_file: .env
+    depends_on:
+      - db
+    volumes:
+      - ./:/app/
+    command: python app/scheduler.py
+
+  scanner:
+    build:
+      context: .
+    restart: always
+    env_file: .env
+    depends_on:
+      - db
+    volumes:
+      - ./:/app/
+    command: python app/services/scanner/start.py
