@@ -5,3 +5,9 @@ compiler:
     solc:
         remappings:
           - "@openzeppelin=OpenZeppelin/openzeppelin-contracts@4.8.2"
+
+networks:
+    default: sepolia
+    gas_limit: auto
+
+dotenv: .env
