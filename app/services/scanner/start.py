@@ -12,5 +12,5 @@ if __name__ == "__main__":
     EventScanner(
         settings.ethereum,
         settings.ethereum.voting_contract.w3_contract.events.VoteCasted(),
-        settings.ethereum.voting_contract.handle_vote_casted,
+        settings.ethereum.voting_contract.handle_vote_casted_event,
     ).start()

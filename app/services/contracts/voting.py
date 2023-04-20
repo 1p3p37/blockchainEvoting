@@ -58,7 +58,7 @@ class VotingContract:
         else:
             self.logger.warning(f"Voting with name {vote_name} already exists.")
 
-    def handle_vote_casted(self, db: Session, event: EventData):
+    def handle_vote_casted_event(self, db: Session, event: EventData):
         tx_hash = event["transactionHash"]
         args = event["args"]
         vote_name = args["voteName"]
