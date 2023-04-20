@@ -1,0 +1,4 @@
+-r dev.txt
+pytest-asyncio==0.14.0
+httpx==0.23.1
+mixer==7.0.6  # https://github.com/klen/mixer#sqlalchemy-workflow
