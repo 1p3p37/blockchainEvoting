@@ -14,5 +14,5 @@ aiohttp==3.8.3
 PyYAML==6.0
 aioredis==2.0.1
 apscheduler==3.9.1
-bitcoinlib==0.6.7
+# bitcoinlib==0.6.7
 web3==5.31.3
