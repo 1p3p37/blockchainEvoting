@@ -26,9 +26,7 @@ class CRUDVote(CRUD):
             .first()
         )
 
-    def get_total_values(
-        self, db: Session, voting: models.Voting
-    ) -> int | None:
+    def get_total_values(self, db: Session, voting: models.Voting) -> int | None:
         total_votes = db.query(Vote).filter(Vote.voting_id == voting.id).count()
         return total_votes
 
@@ -40,12 +38,14 @@ class CRUDVote(CRUD):
             .join(models.Option, models.Option.id == models.Vote.option_id)
             .join(models.Voting, models.Voting.id == models.Option.voting_id)
             .filter(models.Voting.name == voting_name)
-            .order_by(models.Vote.is_revote.desc(), models.Vote.voted_for, models.Vote.block_number)
+            .order_by(
+                models.Vote.is_revote.desc(),
+                models.Vote.voted_for,
+                models.Vote.block_number,
+            )
             .all()
         )
 
-
-    
     # def get_all_votes_by_voting_name(self,
     #         db: Session, voting_name: str
     # ) -> Tuple[Dict[str, Dict[str, List[VoteInDB]]], Dict[str, Dict[str, List[VoteInDB]]]]:
