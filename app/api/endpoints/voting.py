@@ -22,6 +22,7 @@ def get_total_votes(voting_name: str, db: Session = Depends(deps.get_db)):
     total_votes = crud.vote.get_all_votes_by_voting_name(db=db, voting_name=voting_name)
     return total_votes
 
+
 @router.get("/total")
 def get_total_votes(voting_name: str, db: Session = Depends(deps.get_db)):
     voting = crud.voting.get_by_name(db, name=voting_name)
@@ -35,9 +36,7 @@ def get_total_votes(voting_name: str, db: Session = Depends(deps.get_db)):
     total_votes = crud.vote.get_total_values(db=db, voting=voting)
     return total_votes
 
-# get_total_values
-
-
+    # get_total_values
 
     # @router.get("/total_votes", response_model=Dict[str, int])
     # def get_total_votes(
