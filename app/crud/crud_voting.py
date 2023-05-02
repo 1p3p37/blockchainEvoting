@@ -2,7 +2,7 @@ from app import models
 from app.crud.base import CRUD
 from collections import defaultdict
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc, select, literal_column
+from sqlalchemy import func, desc
 from app.models import Voting, Option, Vote
 from typing import Dict, List, Tuple
 from app.schemas import VoteInDB
