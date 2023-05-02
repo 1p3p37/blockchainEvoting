@@ -10,7 +10,7 @@ router = APIRouter()
 
 
 @router.get("/")
-def get_total_votes(voting_name: str, db: Session = Depends(deps.get_db)):
+def get_all_votes(voting_name: str, db: Session = Depends(deps.get_db)):
     voting = crud.voting.get_by_name(db, name=voting_name)
     if not voting:
         raise HTTPException(status_code=404, detail="Voting not found")
@@ -24,7 +24,7 @@ def get_total_votes(voting_name: str, db: Session = Depends(deps.get_db)):
 
 
 @router.get("/total")
-def get_total_votes(voting_name: str, db: Session = Depends(deps.get_db)):
+def get_number_votes(voting_name: str, db: Session = Depends(deps.get_db)):
     voting = crud.voting.get_by_name(db, name=voting_name)
     if not voting:
         raise HTTPException(status_code=404, detail="Voting not found")
@@ -35,6 +35,11 @@ def get_total_votes(voting_name: str, db: Session = Depends(deps.get_db)):
 
     total_votes = crud.vote.get_total_values(db=db, voting=voting)
     return total_votes
+
+
+@router.get("/votings")
+def get_all_votings(db: Session = Depends(deps.get_db)):
+    return crud.voting.get_all_votings(db=db)
 
     # get_total_values
 
@@ -73,7 +78,7 @@ def get_total_votes(voting_name: str, db: Session = Depends(deps.get_db)):
     #     # skip: int = 0,
     #     # limit: int = 100,
     # ) -> Any:
-    return crud.vote.get_all_votes_by_voting_name(
-        db=db,
-        voting_name=voting_name,
-    )
+    # return crud.vote.get_all_votes_by_voting_name(
+    #     db=db,
+    #     voting_name=voting_name,
+    # )

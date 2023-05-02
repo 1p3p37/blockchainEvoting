@@ -2,7 +2,7 @@ from app import models
 from app.crud.base import CRUD
 from collections import defaultdict
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, select, literal_column
 from app.models import Voting, Option, Vote
 from typing import Dict, List, Tuple
 from app.schemas import VoteInDB
@@ -11,6 +11,18 @@ from app.schemas import VoteInDB
 class CRUDVoting(CRUD):
     def get_by_name(self, db: Session, name: str) -> Voting | None:
         return db.query(self.model).filter(self.model.name == name).first()
+
+    def get_all_votings(self, db: Session):
+        votings = db.query(models.Voting).all()
+        result = []
+        for voting in votings:
+            pre_result = []
+            options = db.query(Option.name).filter(Option.voting_id == voting.id).all()
+            option_names = [option.name for option in options]
+            pre_result.append(voting)
+            pre_result.append({"options": option_names})
+            result.append(pre_result)
+        return result
 
 
 class CRUDVote(CRUD):
