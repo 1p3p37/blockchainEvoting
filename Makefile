@@ -3,6 +3,9 @@ include .env
 build-all:
 	sudo ${DOCKER_COMPOSE} up --build -d --force-recreate
 
+build-web:
+	sudo ${DOCKER_COMPOSE} up --build -d --force-recreate web
+
 build-scanner:
 	sudo ${DOCKER_COMPOSE} up --build -d --force-recreate scanner
 
@@ -26,9 +29,11 @@ logs-redis:
 
 logs-db:
 	sudo ${DOCKER_COMPOSE} logs -f db
-	
-logs-scheduler:
-	sudo ${DOCKER_COMPOSE} logs -f scheduler
+
+restart-web:
+	sudo ${DOCKER_COMPOSE} restart web
+
+restart-logs-web: restart-web logs-web
 
 psql: 
 	sudo ${DOCKER_COMPOSE} exec db psql -U ${POSTGRES_USER}
