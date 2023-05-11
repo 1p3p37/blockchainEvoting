@@ -15,5 +15,4 @@ app_v1.include_router(
 app_v1.include_router(
     time_convertor.router,
     prefix="/time-convertor",
-
 )

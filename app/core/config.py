@@ -61,12 +61,6 @@ class EthereumSettings(BlockchainSettings):
             )
         )
 
-    # @cached_property
-    # def reward_contract(self) -> "RewardContract":
-    #     from app.services.contracts.reward import RewardContract
-
-    #     return RewardContract(self)
-
     @cached_property
     def voting_contract(self) -> "VotingContract":
         from app.services.contracts.voting import VotingContract
