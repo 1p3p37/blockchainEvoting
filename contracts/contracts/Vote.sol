@@ -22,8 +22,8 @@ contract Voting {
         ); 
 
     struct Vote {
-        uint256 startTime;
-        uint256 endTime;
+        uint32 startTime;
+        uint32 endTime;
         string[] options;
         EnumerableSet.AddressSet voters;
         mapping(string => bool) optionsMap;
@@ -44,8 +44,8 @@ contract Voting {
 
     function createVote(
         string memory voteName, 
-        uint256 startTime, 
-        uint256 endTime, 
+        uint32 startTime, 
+        uint32 endTime, 
         string[] memory options, 
         address[] memory votePermissionList, 
         address[] memory ownerPermissionList
@@ -112,23 +112,19 @@ contract Voting {
     }
 
     function getOptions(string memory voteName) public view returns (string[] memory) {
-        require(votes[voteName].votePermissions[msg.sender], "You don't have permission to this vote");
         return votes[voteName].options;
     }
 
     function getScore(string memory voteName, string memory option) public view returns (uint) {
-        require(votes[voteName].votePermissions[msg.sender], "You don't have permission to this vote");
         require(votes[voteName].optionsMap[option], "This option doesn't exist");
         return votes[voteName].voteCounts[option];
     }
 
     function hasVoted(string memory voteName) public view returns (bool) {
-        require(votes[voteName].votePermissions[msg.sender], "You don't have permission to this vote");
         return votes[voteName].voters.contains(msg.sender);
     }
 
     function getVoters(string memory voteName) public view returns (address[] memory) {
-        require(votes[voteName].votePermissions[msg.sender], "You don't have permission to this vote");
         uint256 numVoters = votes[voteName].voters.length();
         address[] memory votersArray = new address[](numVoters);
 
@@ -140,7 +136,7 @@ contract Voting {
     }
 
     function grantVoteRights(string memory voteName, address[] memory votePermissionList) public onlyActiveVoting(voteName) {
-        require(votes[voteName].ownerPermissions[msg.sender], "You don't have permission to vote");
+        require(votes[voteName].ownerPermissions[msg.sender], "You don't have permission to grant voting rights");
         
         for (uint i = 0; i < votePermissionList.length; i++) {
             votes[voteName].votePermissions[votePermissionList[i]] = true;

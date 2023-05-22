@@ -26,7 +26,7 @@ def test_grant_vote_rights(vote):
     vote.grantVoteRights("Test Vote", [accounts[2]], {"from": accounts[0]})
 
     # Advance the blockchain timestamp to the start of the voting period
-    Chain().sleep(3600)
+    Chain().sleep(3601)
 
     # Attempt to grant voting rights after the voting period has ended
     # assert vote.grantVoteRights("Test Vote", [accounts[2]], {'from': accounts[0]})
@@ -38,5 +38,5 @@ def test_grant_vote_rights(vote):
     # Ensure the account can cast a vote
     with reverts("Voting has ended"):
         vote.castVote("Test Vote", "Option A", {"from": accounts[2]})
-    with reverts("You don't have permission to this vote"):
-        assert vote.getScore("Test Vote", "Option A") == 1
+    # with reverts("You don't have permission to grant voting rights"):
+    assert vote.getScore("Test Vote", "Option A") == 0

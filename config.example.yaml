@@ -22,7 +22,8 @@ ethereum:
   confirmations_count: 1
   fee_priority: standard
   rpc_url: ""
-  voting_contract_address: "0x9b08AfE17d6683b6605B5F8e8a1E7489545D67eF"
+  # voting_contract_address: "0x9b08AfE17d6683b6605B5F8e8a1E7489545D67eF"
+  voting_contract_address: "0x005eeb805eD83BE8D0AbaB133D3308829bA66edD"
   always_restart_interval: 60
   confirmation_blocks: 5
   scanning_blocks_max: 50
