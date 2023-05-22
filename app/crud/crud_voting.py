@@ -58,6 +58,31 @@ class CRUDVote(CRUD):
             .all()
         )
 
+    def get_score_by_name(self, db: Session, voting_name: str) -> List:
+        voting = (
+            db.query(models.Voting).filter(models.Voting.name == voting_name).first()
+        )
+        if not voting:
+            return []
+
+        options = (
+            db.query(models.Option).filter(models.Option.voting_id == voting.id).all()
+        )
+
+        scores = []
+        for option in options:
+            votes_count = (
+                db.query(models.Vote)
+                .filter(
+                    models.Vote.voting_id == voting.id,
+                    models.Vote.option_id == option.id,
+                )
+                .count()
+            )
+            scores.append({option.name: votes_count})
+
+        return scores
+
     # def get_all_votes_by_voting_name(self,
     #         db: Session, voting_name: str
     # ) -> Tuple[Dict[str, Dict[str, List[VoteInDB]]], Dict[str, Dict[str, List[VoteInDB]]]]:
