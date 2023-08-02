@@ -1,10 +1,10 @@
-from app import models
-from app.crud.base import CRUD
+from typing import Dict, List, Tuple
 from collections import defaultdict
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
+from app import models
+from app.crud.base import CRUD
 from app.models import Voting, Option, Vote
-from typing import Dict, List, Tuple
 from app.schemas import VoteInDB
 
 
@@ -82,45 +82,6 @@ class CRUDVote(CRUD):
             scores.append({option.name: votes_count})
 
         return scores
-
-    # def get_all_votes_by_voting_name(self,
-    #         db: Session, voting_name: str
-    # ) -> Tuple[Dict[str, Dict[str, List[VoteInDB]]], Dict[str, Dict[str, List[VoteInDB]]]]:
-    #     votes = (
-    #         db.query(models.Vote)
-    #         .join(models.Option, models.Option.id == models.Vote.option_id)
-    #         .join(models.Voting, models.Voting.id == models.Option.voting_id)
-    #         # .join(models.Block, models.Block.number == models.Vote.block_number)
-    #         .filter(models.Voting.name == voting_name)
-    #         .order_by(models.Vote.is_revote.desc(), models.Vote.voted_for, models.Vote.block_number)
-    #         .all()
-    #     )
-
-    #     result = {"is_vote": {}, "is_revote": {}}
-
-    #     for vote in votes:
-    #         vote_data = {
-    #             "tx_hash": vote.tx_hash,
-    #             "voting_id": vote.voting_id,
-    #             "voter_address": vote.voter_address,
-    #             "is_revote": vote.is_revote,
-    #             "option_id": vote.option_id,
-    #             "voted_for": vote.voted_for,
-    #             "block_number": vote.block_number,
-    #         }
-
-    #         if vote.is_revote:
-    #             if vote.voted_for not in result["is_revote"]:
-    #                 result["is_revote"][vote.voted_for] = {}
-
-    #             result["is_revote"][vote.voted_for][vote.block_number] = vote_data
-    #         else:
-    #             if vote.voted_for not in result["is_vote"]:
-    #                 result["is_vote"][vote.voted_for] = {}
-
-    #             result["is_vote"][vote.voted_for][vote.block_number] = vote_data
-
-    #     return result
 
 
 """    
