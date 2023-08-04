@@ -1,25 +1,31 @@
-from typing import Dict, List, Tuple
-from collections import defaultdict
+from typing import Dict, List
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
-from app import models
+from sqlalchemy import desc
 from app.crud.base import CRUD
-from app.models import Voting, Option, Vote
-from app.schemas import VoteInDB
+from app import models
+from app import schemas
 
 
 class CRUDVoting(CRUD):
-    def get_by_name(self, db: Session, name: str) -> Voting | None:
+    def get_by_name(self, db: Session, name: str) -> models.Voting | None:
         return db.query(self.model).filter(self.model.name == name).first()
 
-    def get_all_votings(self, db: Session):
+    def get_all_votings(self, db: Session) -> List[Dict[str, any]]:
         votings = db.query(models.Voting).all()
         result = []
         for voting in votings:
             pre_result = []
-            options = db.query(Option.name).filter(Option.voting_id == voting.id).all()
+            options = (
+                db.query(models.Option.name)
+                .filter(models.Option.voting_id == voting.id)
+                .all()
+            )
             option_names = [option.name for option in options]
-            pre_result.append(voting)
+
+            # Convert the SQLAlchemy Voting model to a Pydantic Voting model
+            pydantic_voting = schemas.VotingInDB.from_orm(voting)
+
+            pre_result.append(pydantic_voting.dict())
             pre_result.append({"options": option_names})
             result.append(pre_result)
         return result
@@ -28,7 +34,7 @@ class CRUDVoting(CRUD):
 class CRUDVote(CRUD):
     def get_by_votingId_and_address(
         self, db: Session, voting_id: int, voter_address: str
-    ) -> Vote | None:
+    ) -> models.Vote | None:
         return (
             db.query(self.model)
             .filter(
@@ -39,13 +45,15 @@ class CRUDVote(CRUD):
         )
 
     def get_total_values(self, db: Session, voting: models.Voting) -> int | None:
-        total_votes = db.query(Vote).filter(Vote.voting_id == voting.id).count()
+        total_votes = (
+            db.query(models.Vote).filter(models.Vote.voting_id == voting.id).count()
+        )
         return total_votes
 
     def get_all_votes_by_voting_name(
         self, db: Session, voting_name: str
-    ) -> List[models.Vote]:
-        return (
+    ) -> List[Dict[str, any]]:
+        votes = (
             db.query(models.Vote)
             .join(models.Option, models.Option.id == models.Vote.option_id)
             .join(models.Voting, models.Voting.id == models.Option.voting_id)
@@ -57,6 +65,11 @@ class CRUDVote(CRUD):
             )
             .all()
         )
+
+        # Convert the SQLAlchemy Vote models to a list of Pydantic VoteInDB models
+        pydantic_votes = [schemas.VoteInDB.from_orm(vote).dict() for vote in votes]
+
+        return pydantic_votes
 
     def get_score_by_name(self, db: Session, voting_name: str) -> List:
         voting = (
@@ -89,6 +102,6 @@ from app.api.endpoints.voting import *
 db = Session(Depends(deps.get_db))
 crud.vote.get_all_votes_by_voting_name(db,"s")
 """
-voting = CRUDVoting(Voting)
-vote = CRUDVote(Vote)
-option = CRUD(Option)
+voting = CRUDVoting(models.Voting)
+vote = CRUDVote(models.Vote)
+option = CRUD(models.Option)
