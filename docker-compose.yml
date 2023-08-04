@@ -22,6 +22,12 @@ services:
       - "${DOCKER_EXPOSE_PORT:-8000}:${FASTAPI_PORT:-8000}"
     command: uvicorn app.main:app --host 0.0.0.0 --port "${FASTAPI_PORT:-8000}"
 
+  redis:
+    image: redis:5.0
+    restart: unless-stopped
+    volumes:
+      - ./.docker/redis-data:/data
+
   # scheduler:
   #   build:
   #     context: .
